@@ -25,9 +25,9 @@ stages:
     - script: echo "Running tests"
     # Add your test steps here
 
-- stage: Trigger Github Actions
+- stage: Github
   jobs:
-  - job: Trigger Github API
+  - job: Github
     pool: server
     steps:
     - task: InvokeRESTAPI@1

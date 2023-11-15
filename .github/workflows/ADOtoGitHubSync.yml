@@ -11,7 +11,7 @@ jobs:
       - name: Check out repo        
         uses: actions/checkout@v4
       - run: |
-           $ListObject = GC -Path "$($env:GITHUB_WORKSPACE)\RepoSync\ADORepoList.json" | ConvertFrom-Json
+           $ListObject = GC -Path "$($env:GITHUB_WORKSPACE)\ADORepoList.json" | ConvertFrom-Json
            foreach ($object in $ListObject.RepoList){
             write-host "--------------- Current syncing for repo $($object.AzureRepoName)----------------------------------"
             Set-Location $($env:GITHUB_WORKSPACE)

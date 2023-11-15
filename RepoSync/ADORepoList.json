@@ -1,9 +1,0 @@
-{
-    "RepoList" : [
-    {
-        "AzureRepoName":"Frontend",
-        "ADOCloneURL":"dev.azure.com/VMLS/Anonymous%20Roulette/_git/Frontend",
-         "GitHubCloneURL":"github.com/Digital-Horizon-VMLS/Frontend.git"
-    }
-    ]
-}

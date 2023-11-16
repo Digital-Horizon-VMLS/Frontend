@@ -24,3 +24,24 @@ stages:
     steps:
     - script: echo "Running tests"
     # Add your test steps here
+
+- stage: Github
+  jobs:
+  - job: Github
+    pool: server
+    steps:
+    - task: InvokeRESTAPI@1
+      inputs:
+        connectionType: 'connectedServiceName'
+        serviceConnection: 'GitHub API'
+        method: 'POST'
+        headers: |
+          {
+          "Content-Type":"application/json"
+          }
+        body: |
+          {
+          "event_type": "EVENT_NAME"
+          }
+        urlSuffix: 'repos/Digital-Horizon-VMLS/Frontend/dispatches'
+        waitForCompletion: 'false'

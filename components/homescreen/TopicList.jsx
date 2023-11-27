@@ -4,6 +4,9 @@ import { Stack } from "expo-router";
 
 import styles from "./topicList.style";
 
+// Contains an ItemRenderer, List of topics, FlatList, and user interaction for selection of topics
+// Currently users can select as many topics as they would like
+
 const ItemRenderer = ({ index, label, selected, onUpdateValue }) => <View style={styles.item}>
   <Text style={styles.topicTitle}>{label}</Text>
   <Switch value={selected} onValueChange={(value) => onUpdateValue(index, value)} />

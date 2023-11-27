@@ -6,8 +6,6 @@ import TopicList from '../components/homescreen/TopicList';
 import colors from "../config/colors";
 
 // Home Screen for the application.
-// Contains an ItemRenderer, List of topics, FlatList, and user interaction for selection of topics
-// Currently users can select as many topics as they would like
 
 export default function Page() {
 

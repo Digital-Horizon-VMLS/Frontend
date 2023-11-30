@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
   },
   appName: {
     position: "absolute",
+    paddingHorizontal: 1,
     top: 150,
     fontSize: 40,
     fontWeight: "bold",

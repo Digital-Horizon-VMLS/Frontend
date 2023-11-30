@@ -9,11 +9,12 @@ import colors from "../config/colors";
 export default () => {
     return (
         <Tabs 
-            screenOptions={{tabBarShowLabel: false, tabBarStyle: {backgroundColor: colors.secondary, height: 60, borderWidth: 0, borderColor: colors.primary}, 
-            headerShown: false }}>
-        <Tabs.Screen name="index" options={{tabBarIcon: () => <Icon name="home-button" height={30} width={30} color='black'/>}} />
+            screenOptions={{tabBarShowLabel: false, tabBarStyle: {backgroundColor: colors.secondary, height: 60, borderWidth: 0, borderColor: colors.primary} }}>
+        <Tabs.Screen name="index" options={{tabBarIcon: () => <Icon name="home-button" height={30} width={30} color='black'/>, headerShown: false}} />
 
-        <Tabs.Screen name="profile" options={{tabBarIcon: () => <Icon name="user-shape" height={30} width={30} color='black'/>}} />
+        <Tabs.Screen name="editProfile" options={{tabBarIcon: () => <Icon name="user-shape" height={30} width={30} color='black'/>, headerStyle: {
+            backgroundColor: colors.secondary, 
+        }, headerTitle: "Edit Profile"}} />
 
         </Tabs>
     )

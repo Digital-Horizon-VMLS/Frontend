@@ -10,11 +10,16 @@ export default () => {
     return (
         <Tabs 
             screenOptions={{tabBarShowLabel: false, tabBarStyle: {backgroundColor: colors.secondary, height: 60, borderWidth: 0, borderColor: colors.primary} }}>
-        <Tabs.Screen name="index" options={{tabBarIcon: () => <Icon name="home-button" height={30} width={30} color='black'/>, headerShown: false}} />
 
-        <Tabs.Screen name="editProfile" options={{tabBarIcon: () => <Icon name="user-shape" height={30} width={30} color='black'/>, headerStyle: {
-            backgroundColor: colors.secondary, 
-        }, headerTitle: "Edit Profile"}} />
+            <Tabs.Screen name="index" options={{tabBarIcon: () => <Icon name="home-button" height={30} width={30} color='black'/>, headerShown: false}} />
+
+            <Tabs.Screen name="editProfile" options={{tabBarIcon: () => <Icon name="user-shape" height={30} width={30} color='black'/>, headerStyle: {
+                backgroundColor: colors.secondary, 
+            }, headerTitle: "Edit Profile"}} />
+
+            <Tabs.Screen name="friends" options={{tabBarIcon: () => <Icon name="users-social-symbol" height={30} width={30} color='black'/>, headerShown: false}} />
+
+            <Tabs.Screen name="settings" options={{tabBarIcon: () => <Icon name="settings-cogwheel-button" height={30} width={30} color='black'/>, headerShown: true}} />
 
         </Tabs>
     )

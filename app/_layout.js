@@ -1,5 +1,5 @@
-import { Tabs, Navigator, Stack, ExpoRoot} from "expo-router";
-import Icon from 'react-native-ico-material-design';
+import { Tabs, Navigator, Stack, ExpoRoot } from "expo-router";
+import Icon from "react-native-ico-material-design";
 
 import colors from "../config/colors";
 
@@ -7,20 +7,88 @@ import colors from "../config/colors";
 // Includes customization such as Icons, colors, sizes, etc.
 
 export default () => {
-    return (
-        <Tabs 
-            screenOptions={{tabBarShowLabel: false, tabBarStyle: {backgroundColor: colors.secondary, height: 60, borderWidth: 0, borderColor: colors.primary} }}>
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarShowLabel: true,
+        tabBarLabelStyle: {
+          color: "white",
+          fontSize: 15,
+        },
+        tabBarStyle: {
+          backgroundColor: colors.secondary,
+          height: 60,
+          borderWidth: 0,
+          borderColor: colors.primary,
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          tabBarIcon: () => (
+            <Icon name="home-button" height={25} width={25} color="white" />
+          ),
+          tabBarLabel: "Home",
+          headerShown: false,
+        }}
+      />
 
-            <Tabs.Screen name="index" options={{tabBarIcon: () => <Icon name="home-button" height={30} width={30} color='black'/>, headerShown: false}} />
+      <Tabs.Screen
+        name="findChat"
+        options={{
+          tabBarIcon: () => (
+            <Icon
+              name="searching-magnifying-glass"
+              height={25}
+              width={25}
+              color="white"
+            />
+          ),
+          tabBarLabel: "Find Chat",
+          headerShown: false,
+        }}
+      />
 
-            <Tabs.Screen name="editProfile" options={{tabBarIcon: () => <Icon name="user-shape" height={30} width={30} color='black'/>, headerStyle: {
-                backgroundColor: colors.secondary, 
-            }, headerTitle: "Edit Profile"}} />
+      <Tabs.Screen
+        name="friends"
+        options={{
+          tabBarIcon: () => (
+            <Icon
+              name="users-social-symbol"
+              height={25}
+              width={25}
+              color="white"
+            />
+          ),
+          tabBarLabel: "Friends",
+          headerShown: false,
+        }}
+      />
 
-            <Tabs.Screen name="friends" options={{tabBarIcon: () => <Icon name="users-social-symbol" height={30} width={30} color='black'/>, headerShown: false}} />
-
-            <Tabs.Screen name="settings" options={{tabBarIcon: () => <Icon name="settings-cogwheel-button" height={30} width={30} color='black'/>, headerShown: true}} />
-
-        </Tabs>
-    )
-}
+      <Tabs.Screen
+        name="settings"
+        options={{
+          tabBarIcon: () => (
+            <Icon
+              name="settings-cogwheel-button"
+              height={25}
+              width={25}
+              color="white"
+            />
+          ),
+          tabBarLabel: "Settings",
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: colors.secondary,
+          },
+          headerTitle: "Settings",
+          headerTitleStyle: {
+            color: "white",
+            alignContent: "center",
+          },
+        }}
+      />
+    </Tabs>
+  );
+};

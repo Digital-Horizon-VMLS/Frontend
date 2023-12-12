@@ -1,11 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, Image, SafeAreaView } from "react-native";
-import { Link, Stack } from "expo-router";
 
-import TopicList from "../components/homescreen/TopicList";
+import TopicList from "../components/findchat/TopicList";
 import colors from "../config/colors";
 
-// Home Screen for the application.
+// Page for selecting topics and finding a chat. Uses components found in TopicList.jsx
 
 export default function Page() {
   return (

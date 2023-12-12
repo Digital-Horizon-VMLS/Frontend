@@ -1,105 +1,395 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Image, View, TouchableOpacity, Text, TextInput, Pressable, Modal } from 'react-native';
-import { useFonts } from 'expo-font';
-import * as ImagePicker from 'expo-image-picker';
-import Icon from 'react-native-ico-material-design';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Image,
+  View,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  Pressable,
+  Modal,
+} from "react-native";
+import { useFonts } from "expo-font";
+import * as ImagePicker from "expo-image-picker";
+import Icon from "react-native-ico-material-design";
 
-import styles from './editSettings.style';
+import styles from "./editSettings.style";
 
+// Includes settings page components such as Image uploader, and various settings options
+// Changing password, signing out, and deleting account not yet implemented as intended
+
+// Component for uploading an image
 const UploadImage = () => {
-    const [image, setImage] = useState(null);
-  
-    const addImage = async () => {
-      let _image = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-  
-      console.log(JSON.stringify(_image));
-  
-      if (!_image.cancelled) {
-        setImage(_image.uri);
-      }
-    };
+  const [image, setImage] = useState(null);
 
-    return (
-      <View style={{
-        flex: 1,
-        paddingHorizontal: 22
-      }}>
-        <View style={styles.container}>
-          <View style={styles.imageContainer}>
-            {image && <Image source={{ uri: image }} style={styles.imageStyle} />}
-          </View>
-          <View style={styles.uploadBtnContainer}>
-            <TouchableOpacity onPress={addImage} style={styles.uploadBtn}>
-              <Text>{image ? 'Edit' : 'Upload'} Image</Text>
-              <Icon name="camera" height={20} width={20} color='black'/>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-      </View>
-    );
-  };
-//assets/fonts/OpenSans_Condensed-Medium.ttf
-  const EditInfo = () => {
-    const [fontsLoaded, fontError] = useFonts({
-      'OpenSans-Regular': require('../../assets/fonts/OpenSans-Regular.ttf'),
-      'OpenSans-Italic': require('../../assets/fonts/OpenSans-Italic.ttf'),
-      'OpenSans-SemiBold': require('../../assets/fonts/OpenSans-SemiBold.ttf'),
-      'OpenSans-Bold': require('../../assets/fonts/OpenSans_Condensed-Bold.ttf'),
-      'OpenSans-Medium': require('../../assets/fonts/OpenSans_Condensed-Medium.ttf'),
+  // Function to handle image upload
+  const addImage = async () => {
+    let _image = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
 
-    const [showModal, setShowModal] = useState(false);
-  
-    const onLayoutRootView = useCallback(async () => {
-      if (fontsLoaded || fontError) {
-        await SplashScreen.hideAsync();
-      }
-    }, [fontsLoaded, fontError]);
-  
-    if (!fontsLoaded && !fontError) {
-      return null;
-    }
+    console.log(JSON.stringify(_image));
 
-    return (
-      <View>
-      <Modal 
-        transparent={true}
-        visible={showModal}
-      >
+    if (!_image.canceled) {
+      setImage(_image.uri);
+    }
+  };
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: 22,
+      }}
+    >
+      <View style={styles.container}>
+        <View style={styles.imageContainer}>
+          {image && <Image source={{ uri: image }} style={styles.imageStyle} />}
+          {!image && (
+            <Icon name="user-shape" height={130} width={130} color="#BFBDBD" />
+          )}
+        </View>
+        <View style={styles.uploadBtnContainer}>
+          <TouchableOpacity onPress={addImage} style={styles.uploadBtn}>
+            <Text>{image ? "Edit" : "Upload"} Image</Text>
+            <Icon name="camera" height={20} width={20} color="black" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+// Component for editing user information
+const EditInfo = () => {
+  const [showModalOne, setShowModalOne] = useState(false);
+  const [showModalTwo, setShowModalTwo] = useState(false);
+
+  const [description, setDescription] = useState();
+  const [firstName, setFirstName] = useState();
+  const [lastName, setLastName] = useState();
+  const [email, setEmail] = useState();
+  const [oldPass, setOldPass] = useState();
+  const [newPass, setNewPass] = useState();
+
+  const [fontsLoaded, fontError] = useFonts({
+    "OpenSans-Regular": require("../../assets/fonts/OpenSans-Regular.ttf"),
+    "OpenSans-Italic": require("../../assets/fonts/OpenSans-Italic.ttf"),
+    "OpenSans-SemiBold": require("../../assets/fonts/OpenSans-SemiBold.ttf"),
+    "OpenSans-Bold": require("../../assets/fonts/OpenSans_Condensed-Bold.ttf"),
+    "OpenSans-Medium": require("../../assets/fonts/OpenSans_Condensed-Medium.ttf"),
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
+  return (
+    <View>
+      <Modal transparent={true} visible={showModalOne}>
         <View style={styles.centerView}>
-          <View style={styles.modalView}>
-            <Text>Shello</Text>
-            <Pressable style={styles.saveButton} onPress={() => setShowModal(false)}>
-              <Text>Save Changes</Text>
+          <View style={styles.modalViewOne}>
+            <View style={styles.modalOverhead}>
+              <Text
+                style={{
+                  fontFamily: "OpenSans-Bold",
+                  fontSize: 25,
+                  color: "white",
+                  textAlign: "center",
+                  position: "relative",
+                }}
+              >
+                Update Profile Information
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <View
+                style={{
+                  height: 80,
+                  width: 275,
+                  borderColor: "grey",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  paddingLeft: 8,
+                  alignSelf: "center",
+                }}
+              >
+                <TextInput
+                  placeholder="Enter something about yourself"
+                  value={description}
+                  multiline={true}
+                  onChangeText={(value) => setDescription(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <View
+                style={{
+                  height: 44,
+                  width: 275,
+                  borderColor: "grey",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  justifyContent: "center",
+                  paddingLeft: 8,
+                  alignSelf: "center",
+                }}
+              >
+                <TextInput
+                  placeholder="First Name"
+                  value={firstName}
+                  multiline={true}
+                  onChangeText={(value) => setFirstName(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <View
+                style={{
+                  height: 44,
+                  width: 275,
+                  borderColor: "grey",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  justifyContent: "center",
+                  paddingLeft: 8,
+                  alignSelf: "center",
+                }}
+              >
+                <TextInput
+                  placeholder="Last Name"
+                  value={lastName}
+                  multiline={true}
+                  onChangeText={(value) => setLastName(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <View
+                style={{
+                  height: 44,
+                  width: 275,
+                  borderColor: "grey",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  justifyContent: "center",
+                  paddingLeft: 8,
+                  alignSelf: "center",
+                }}
+              >
+                <TextInput
+                  placeholder="Email"
+                  value={email}
+                  multiline={true}
+                  onChangeText={(value) => setEmail(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
+            <Pressable
+              style={styles.updateButton}
+              onPress={() => setShowModalOne(false)}
+            >
+              <Text
+                style={{
+                  fontFamily: "OpenSans-SemiBold",
+                  color: "white",
+                  fontSize: 20,
+                }}
+              >
+                Update
+              </Text>
             </Pressable>
           </View>
         </View>
-
       </Modal>
-      <Pressable onPress={() => setShowModal(true)}>
+      <Pressable onPress={() => setShowModalOne(true)}>
         <View style={styles.textOptions}>
-        <Icon name="create-new-pencil-button" height={25} width={25} color='black'/>
-          <Text style={{fontFamily: 'OpenSans-SemiBold', fontSize: 18}}>Update Profile</Text>
+          <Icon
+            name="create-new-pencil-button"
+            height={25}
+            width={25}
+            color="black"
+          />
+          <Text style={{ fontFamily: "OpenSans-SemiBold", fontSize: 18 }}>
+            Update Profile
+          </Text>
+        </View>
+      </Pressable>
+      <Modal transparent={true} visible={showModalTwo}>
+        <View style={styles.centerView}>
+          <View style={styles.modalViewTwo}>
+            <View style={styles.modalOverhead}>
+              <Text
+                style={{
+                  fontFamily: "OpenSans-Bold",
+                  fontSize: 25,
+                  color: "white",
+                  textAlign: "center",
+                  position: "relative",
+                }}
+              >
+                Change Password
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <View
+                style={{
+                  height: 44,
+                  width: 275,
+                  borderColor: "grey",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  justifyContent: "center",
+                  paddingLeft: 8,
+                  alignSelf: "center",
+                }}
+              >
+                <TextInput
+                  placeholder="Old Password"
+                  value={oldPass}
+                  multiline={true}
+                  onChangeText={(value) => setOldPass(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "column",
+                marginBottom: 6,
+              }}
+            >
+              <View
+                style={{
+                  height: 44,
+                  width: 275,
+                  borderColor: "grey",
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  marginVertical: 6,
+                  justifyContent: "center",
+                  paddingLeft: 8,
+                  alignSelf: "center",
+                }}
+              >
+                <TextInput
+                  placeholder="New Password"
+                  value={newPass}
+                  multiline={true}
+                  onChangeText={(value) => setNewPass(value)}
+                  editable={true}
+                />
+              </View>
+            </View>
+            <Pressable
+              style={styles.updateButton}
+              onPress={() => setShowModalTwo(false)}
+            >
+              <Text
+                style={{
+                  fontFamily: "OpenSans-SemiBold",
+                  color: "white",
+                  fontSize: 20,
+                }}
+              >
+                Update
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Pressable onPress={() => setShowModalTwo(true)}>
+        <View style={styles.textOptions}>
+          <Icon
+            name="locked-padlock-outline"
+            height={25}
+            width={25}
+            color="black"
+          />
+          <Text style={{ fontFamily: "OpenSans-SemiBold", fontSize: 18 }}>
+            Change Password
+          </Text>
         </View>
       </Pressable>
 
       <View style={styles.textOptions}>
-      <Icon name="locked-padlock-outline" height={25} width={25} color='black'/>
-        <Text style={{fontFamily: 'OpenSans-SemiBold', fontSize: 18}}>Change Password</Text>
+        <Icon name="exit-to-app-button" height={25} width={25} color="black" />
+        <Text
+          style={{
+            fontFamily: "OpenSans-SemiBold",
+            fontSize: 18,
+            color: "black",
+          }}
+        >
+          Sign Out
+        </Text>
       </View>
-        
-      </View>
-      
-    );
-  };
 
-  export {
-    UploadImage,
-    EditInfo,
-  }
+      <View style={styles.textOptions}>
+        <Icon
+          name="rubbish-bin-delete-button"
+          height={25}
+          width={25}
+          color="red"
+        />
+        <Text
+          style={{
+            fontFamily: "OpenSans-SemiBold",
+            fontSize: 18,
+            color: "red",
+          }}
+        >
+          Delete Account
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+export { UploadImage, EditInfo };

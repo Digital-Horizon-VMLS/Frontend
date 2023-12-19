@@ -7,7 +7,7 @@ import {
   FlatList,
   Modal,
 } from "react-native";
-import axios from "axios";
+import axios from "../../config/axiosConfig";
 import { Stack } from "expo-router";
 import Constants from "expo-constants";
 
@@ -28,13 +28,13 @@ const ItemRenderer = ({ id, name, selected, onUpdateValue }) => (
   </View>
 );
 
-// API base URL
+// API base URL (Currently not used)
 const uri = Constants?.expoConfig?.hostUri
   ? Constants.expoConfig.hostUri.split(`:`).shift().concat(`:4000`)
   : `localhost:4000`;
 
 // URL for API goes here (API base URL did not work for me so I used ngrok). Choose option that works.
-axios.defaults.baseURL = "url goes here";
+// axios.defaults.baseURL = "https://99aa-174-164-216-97.ngrok-free.app";
 console.log(axios.defaults.baseURL);
 
 const TopicList = () => {

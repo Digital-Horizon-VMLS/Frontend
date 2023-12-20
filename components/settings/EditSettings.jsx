@@ -7,11 +7,14 @@ import {
   TextInput,
   Pressable,
   Modal,
+  FlatList,
 } from "react-native";
 import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
+import axios from "../../config/axiosConfig";
 import Icon from "react-native-ico-material-design";
 
+import { deleteAccount } from "./DeleteAccount";
 import styles from "./editSettings.style";
 
 // Includes settings page components such as Image uploader, and various settings options
@@ -66,6 +69,21 @@ const UploadImage = () => {
 const EditInfo = () => {
   const [showModalOne, setShowModalOne] = useState(false);
   const [showModalTwo, setShowModalTwo] = useState(false);
+  const [ethnicities, setEthnicities] = useState([]);
+  const [selectedEthnicity, setSelectedEthnicity] = useState(null);
+  const [showModalForEthnicities, setShowModalForEthnicities] = useState(false);
+
+  useEffect(() => {
+    axios
+      .get("/api/ethnicities")
+      .then((response) => setEthnicities(response.data)) // Update to setEthnicities
+      .catch((err) => console.log(err));
+  }, []);
+
+  const handleSelectEthnicity = (ethnicity) => {
+    setSelectedEthnicity(ethnicity);
+    setShowModalOne(false); // Hide the modal after selection
+  };
 
   const [description, setDescription] = useState();
   const [firstName, setFirstName] = useState();
@@ -91,6 +109,18 @@ const EditInfo = () => {
   if (!fontsLoaded && !fontError) {
     return null;
   }
+
+  const handleDeleteAccount = async () => {
+    const userId = 1; // Replace with the actual user ID
+    try {
+      const result = await deleteAccount(userId);
+      console.log("Account deleted:", result);
+      // Handle success or show a message
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      // Handle error or show an error message
+    }
+  };
 
   return (
     <View>
@@ -129,6 +159,7 @@ const EditInfo = () => {
                 }}
               >
                 <TextInput
+                  style={{ fontSize: 14 }}
                   placeholder="Enter something about yourself"
                   value={description}
                   multiline={true}
@@ -158,6 +189,7 @@ const EditInfo = () => {
                 }}
               >
                 <TextInput
+                  style={{ fontSize: 14 }}
                   placeholder="First Name"
                   value={firstName}
                   multiline={true}
@@ -187,6 +219,7 @@ const EditInfo = () => {
                 }}
               >
                 <TextInput
+                  style={{ fontSize: 14 }}
                   placeholder="Last Name"
                   value={lastName}
                   multiline={true}
@@ -216,6 +249,7 @@ const EditInfo = () => {
                 }}
               >
                 <TextInput
+                  style={{ fontSize: 14 }}
                   placeholder="Email"
                   value={email}
                   multiline={true}
@@ -224,6 +258,53 @@ const EditInfo = () => {
                 />
               </View>
             </View>
+
+            <View style={{ flexDirection: "column", marginBottom: 6 }}>
+              <Pressable onPress={() => setShowModalForEthnicities(true)}>
+                <View
+                  style={{
+                    height: 44,
+                    width: 275,
+                    borderColor: "grey",
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    marginVertical: 6,
+                    justifyContent: "center",
+                    paddingLeft: 8,
+                    alignSelf: "center",
+                  }}
+                >
+                  <Text style={{ fontSize: 14 }}>
+                    {selectedEthnicity
+                      ? selectedEthnicity.name
+                      : "Select Ethnicity"}
+                  </Text>
+                </View>
+              </Pressable>
+
+              <Modal transparent={true} visible={showModalForEthnicities}>
+                <View style={styles.centerView}>
+                  <View style={styles.modalViewOne}>
+                    <FlatList
+                      data={ethnicities}
+                      keyExtractor={(item) => item.id.toString()}
+                      renderItem={({ item }) => (
+                        <Pressable
+                          style={styles.ethnicityItem}
+                          onPress={() => {
+                            handleSelectEthnicity(item);
+                            setShowModalForEthnicities(false); // Close the modal after selecting an ethnicity
+                          }}
+                        >
+                          <Text style={styles.ethnicityText}>{item.name}</Text>
+                        </Pressable>
+                      )}
+                    />
+                  </View>
+                </View>
+              </Modal>
+            </View>
+
             <Pressable
               style={styles.updateButton}
               onPress={() => setShowModalOne(false)}
@@ -370,24 +451,25 @@ const EditInfo = () => {
           Sign Out
         </Text>
       </View>
-
-      <View style={styles.textOptions}>
-        <Icon
-          name="rubbish-bin-delete-button"
-          height={25}
-          width={25}
-          color="red"
-        />
-        <Text
-          style={{
-            fontFamily: "OpenSans-SemiBold",
-            fontSize: 18,
-            color: "red",
-          }}
-        >
-          Delete Account
-        </Text>
-      </View>
+      <Pressable onPress={handleDeleteAccount}>
+        <View style={styles.textOptions}>
+          <Icon
+            name="rubbish-bin-delete-button"
+            height={25}
+            width={25}
+            color="red"
+          />
+          <Text
+            style={{
+              fontFamily: "OpenSans-SemiBold",
+              fontSize: 18,
+              color: "red",
+            }}
+          >
+            Delete Account
+          </Text>
+        </View>
+      </Pressable>
     </View>
   );
 };

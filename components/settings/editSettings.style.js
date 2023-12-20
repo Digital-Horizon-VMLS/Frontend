@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalViewOne: {
-    height: 400,
+    height: 500,
     width: 350,
     backgroundColor: "white",
     padding: 60,

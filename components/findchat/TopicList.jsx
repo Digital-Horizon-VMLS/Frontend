@@ -28,15 +28,6 @@ const ItemRenderer = ({ id, name, selected, onUpdateValue }) => (
   </View>
 );
 
-// API base URL (Currently not used)
-const uri = Constants?.expoConfig?.hostUri
-  ? Constants.expoConfig.hostUri.split(`:`).shift().concat(`:4000`)
-  : `localhost:4000`;
-
-// URL for API goes here (API base URL did not work for me so I used ngrok). Choose option that works.
-// axios.defaults.baseURL = "https://99aa-174-164-216-97.ngrok-free.app";
-console.log(axios.defaults.baseURL);
-
 const TopicList = () => {
   const [open, setOpen] = React.useState(false);
   const [data, setData] = React.useState([]);
@@ -110,7 +101,9 @@ const TopicList = () => {
 
       {/* View to display selected topics */}
       <View style={styles.selectedTopicsContainer}>
-        <Text style={styles.selectedTopicsTitle}>Selected Items</Text>
+        <Text style={styles.selectedTopicsTitle}>
+          {selectedTopics.length > 0 ? "Selected Items" : "No Topics Selected"}
+        </Text>
         <View style={styles.selectedTopics}>
           {data
             .filter((item) => item.selected)

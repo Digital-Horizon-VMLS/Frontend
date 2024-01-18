@@ -1,5 +1,5 @@
 import { View, StyleSheet, SafeAreaView, Text } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 
 import { UploadImage, EditInfo } from "../components/settings/EditSettings";
 import colors from "../config/colors";
@@ -14,7 +14,7 @@ export default function Page() {
           <UploadImage />
         </View>
 
-        <Text style={{ fontSize: 22, top: 90 }}>Username</Text>
+        <Text style={{ fontSize: 22, top: 90, color: "white" }}>Username</Text>
       </View>
       <View style={styles.userInfo}>
         <EditInfo />
@@ -25,10 +25,10 @@ export default function Page() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.primary,
+    backgroundColor: "#2c3e50",
     alignItems: "center",
     justifyContent: "center",
-    flex: 0.5,
+    height: 225,
   },
   background: {
     backgroundColor: "white",

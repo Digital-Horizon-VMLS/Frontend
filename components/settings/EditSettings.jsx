@@ -3,18 +3,24 @@ import {
   Image,
   View,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
   Text,
   TextInput,
   Pressable,
   Modal,
   FlatList,
+  Platform,
 } from "react-native";
 import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "../../config/axiosConfig";
 import Icon from "react-native-ico-material-design";
 
+import { updateUserData } from "./UpdateInfo";
 import { deleteAccount } from "./DeleteAccount";
+import { signOut } from "./SignOut";
 import styles from "./editSettings.style";
 
 // Includes settings page components such as Image uploader, and various settings options
@@ -73,6 +79,7 @@ const EditInfo = () => {
   const [selectedEthnicity, setSelectedEthnicity] = useState(null);
   const [showModalForEthnicities, setShowModalForEthnicities] = useState(false);
 
+  // Ethnicities endpoint
   useEffect(() => {
     axios
       .get("/api/ethnicities")
@@ -82,15 +89,88 @@ const EditInfo = () => {
 
   const handleSelectEthnicity = (ethnicity) => {
     setSelectedEthnicity(ethnicity);
-    setShowModalOne(false); // Hide the modal after selection
+    setShowModalForEthnicities(false); // Hide the modal after selection
   };
 
   const [description, setDescription] = useState();
+  const [username, setUsername] = useState();
   const [firstName, setFirstName] = useState();
   const [lastName, setLastName] = useState();
-  const [email, setEmail] = useState();
+  const [dateOfBirth, setDateOfBirth] = useState(null);
+  const [temporaryDate, setTemporaryDate] = useState(dateOfBirth);
   const [oldPass, setOldPass] = useState();
   const [newPass, setNewPass] = useState();
+
+  const [showPicker, setShowPicker] = useState(false);
+
+  const toggleDatePicker = () => {
+    setShowPicker(!showPicker);
+  };
+
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || dateOfBirth;
+    setShowPicker(Platform.OS === "ios"); // Close date picker on iOS
+    setDateOfBirth(currentDate);
+  };
+
+  const [originalState, setOriginalState] = useState({
+    description: "",
+    username: "",
+    firstName: "",
+    lastName: "",
+    dateOfBirth: null,
+    temporaryDate: null,
+  });
+
+  useEffect(() => {
+    // Save the initial state when the component mounts
+    setOriginalState({
+      description,
+      username,
+      firstName,
+      lastName,
+      dateOfBirth,
+      temporaryDate,
+      // Add other fields you want to revert
+    });
+  }, []);
+
+  const handleCancel = () => {
+    // Revert to the original state when the modal is closed without updating
+    setDescription(originalState.description);
+    setUsername(originalState.username);
+    setFirstName(originalState.firstName);
+    setLastName(originalState.lastName);
+    setDateOfBirth(originalState.dateOfBirth);
+    setTemporaryDate(originalState.temporaryDate);
+    // Revert other fields as needed
+    setShowModalOne(false);
+  };
+
+  const handleUpdate = async () => {
+    const userID = 1; // Replace with the actual user ID
+
+    // Create an object with the fields to be updated
+    const userDataToUpdate = {
+      first_name: firstName,
+      last_name: lastName,
+      username: username,
+      profile_description: description,
+      ethnic_id: selectedEthnicity?.id,
+      birth_date: dateOfBirth, // Updated to use temporaryDate
+      // Add other fields you want to update
+    };
+
+    try {
+      // Call the updateUserData function with the user ID and updated data
+      const updatedData = await updateUserData(userID, userDataToUpdate);
+      console.log("User data updated successfully:", updatedData);
+      // Handle success (e.g., show a success message, update UI, etc.)
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      // Handle error (e.g., show an error message)
+    }
+  };
 
   const [fontsLoaded, fontError] = useFonts({
     "OpenSans-Regular": require("../../assets/fonts/OpenSans-Regular.ttf"),
@@ -111,216 +191,321 @@ const EditInfo = () => {
   }
 
   const handleDeleteAccount = async () => {
-    const userId = 1; // Replace with the actual user ID
+    const userId = 1;
     try {
       const result = await deleteAccount(userId);
       console.log("Account deleted:", result);
-      // Handle success or show a message
     } catch (error) {
       console.error("Error deleting account:", error);
-      // Handle error or show an error message
+    }
+  };
+
+  const handleSignOut = async () => {
+    const userId = 1; // Replace with the actual user ID
+    try {
+      const result = await signOut(userId);
+      console.log("You have successfully signed out:", result);
+    } catch (error) {
+      console.error("Error signing out:", error);
     }
   };
 
   return (
     <View>
-      <Modal transparent={true} visible={showModalOne}>
-        <View style={styles.centerView}>
-          <View style={styles.modalViewOne}>
-            <View style={styles.modalOverhead}>
-              <Text
-                style={{
-                  fontFamily: "OpenSans-Bold",
-                  fontSize: 25,
-                  color: "white",
-                  textAlign: "center",
-                  position: "relative",
-                }}
-              >
-                Update Profile Information
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "column",
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  height: 80,
-                  width: 275,
-                  borderColor: "grey",
-                  borderWidth: 1,
-                  borderRadius: 4,
-                  marginVertical: 6,
-                  paddingLeft: 8,
-                  alignSelf: "center",
-                }}
-              >
-                <TextInput
-                  style={{ fontSize: 14 }}
-                  placeholder="Enter something about yourself"
-                  value={description}
-                  multiline={true}
-                  onChangeText={(value) => setDescription(value)}
-                  editable={true}
-                />
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "column",
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  height: 44,
-                  width: 275,
-                  borderColor: "grey",
-                  borderWidth: 1,
-                  borderRadius: 4,
-                  marginVertical: 6,
-                  justifyContent: "center",
-                  paddingLeft: 8,
-                  alignSelf: "center",
-                }}
-              >
-                <TextInput
-                  style={{ fontSize: 14 }}
-                  placeholder="First Name"
-                  value={firstName}
-                  multiline={true}
-                  onChangeText={(value) => setFirstName(value)}
-                  editable={true}
-                />
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "column",
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  height: 44,
-                  width: 275,
-                  borderColor: "grey",
-                  borderWidth: 1,
-                  borderRadius: 4,
-                  marginVertical: 6,
-                  justifyContent: "center",
-                  paddingLeft: 8,
-                  alignSelf: "center",
-                }}
-              >
-                <TextInput
-                  style={{ fontSize: 14 }}
-                  placeholder="Last Name"
-                  value={lastName}
-                  multiline={true}
-                  onChangeText={(value) => setLastName(value)}
-                  editable={true}
-                />
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "column",
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  height: 44,
-                  width: 275,
-                  borderColor: "grey",
-                  borderWidth: 1,
-                  borderRadius: 4,
-                  marginVertical: 6,
-                  justifyContent: "center",
-                  paddingLeft: 8,
-                  alignSelf: "center",
-                }}
-              >
-                <TextInput
-                  style={{ fontSize: 14 }}
-                  placeholder="Email"
-                  value={email}
-                  multiline={true}
-                  onChangeText={(value) => setEmail(value)}
-                  editable={true}
-                />
-              </View>
-            </View>
-
-            <View style={{ flexDirection: "column", marginBottom: 6 }}>
-              <Pressable onPress={() => setShowModalForEthnicities(true)}>
-                <View
-                  style={{
-                    height: 44,
-                    width: 275,
-                    borderColor: "grey",
-                    borderWidth: 1,
-                    borderRadius: 4,
-                    marginVertical: 6,
-                    justifyContent: "center",
-                    paddingLeft: 8,
-                    alignSelf: "center",
-                  }}
-                >
-                  <Text style={{ fontSize: 14 }}>
-                    {selectedEthnicity
-                      ? selectedEthnicity.name
-                      : "Select Ethnicity"}
+      <Modal transparent={true} visible={showModalOne} animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setShowModalOne(false)}>
+          <View style={styles.centerView}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={styles.modalViewOne}>
+                <View style={styles.modalOverhead}>
+                  <Text
+                    style={{
+                      fontFamily: "OpenSans-Bold",
+                      fontSize: 25,
+                      color: "white",
+                      textAlign: "center",
+                      position: "relative",
+                    }}
+                  >
+                    Update Profile Information
                   </Text>
                 </View>
-              </Pressable>
-
-              <Modal transparent={true} visible={showModalForEthnicities}>
-                <View style={styles.centerView}>
-                  <View style={styles.modalViewOne}>
-                    <FlatList
-                      data={ethnicities}
-                      keyExtractor={(item) => item.id.toString()}
-                      renderItem={({ item }) => (
-                        <Pressable
-                          style={styles.ethnicityItem}
-                          onPress={() => {
-                            handleSelectEthnicity(item);
-                            setShowModalForEthnicities(false); // Close the modal after selecting an ethnicity
-                          }}
-                        >
-                          <Text style={styles.ethnicityText}>{item.name}</Text>
-                        </Pressable>
-                      )}
+                <View
+                  style={{
+                    flexDirection: "column",
+                    marginBottom: 6,
+                  }}
+                >
+                  <View
+                    style={{
+                      height: 80,
+                      width: 275,
+                      borderColor: "grey",
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      marginVertical: 6,
+                      paddingLeft: 8,
+                      alignSelf: "center",
+                    }}
+                  >
+                    <TextInput
+                      style={{ fontSize: 14 }}
+                      placeholder="Enter something about yourself"
+                      value={description}
+                      multiline={true}
+                      onChangeText={(value) => setDescription(value)}
+                      editable={true}
                     />
                   </View>
                 </View>
-              </Modal>
-            </View>
 
-            <Pressable
-              style={styles.updateButton}
-              onPress={() => setShowModalOne(false)}
-            >
-              <Text
-                style={{
-                  fontFamily: "OpenSans-SemiBold",
-                  color: "white",
-                  fontSize: 20,
-                }}
-              >
-                Update
-              </Text>
-            </Pressable>
+                <View
+                  style={{
+                    flexDirection: "column",
+                    marginBottom: 6,
+                  }}
+                >
+                  <View
+                    style={{
+                      height: 44,
+                      width: 275,
+                      borderColor: "grey",
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      marginVertical: 6,
+                      justifyContent: "center",
+                      paddingLeft: 8,
+                      alignSelf: "center",
+                    }}
+                  >
+                    <TextInput
+                      style={{ fontSize: 14 }}
+                      placeholder="Username"
+                      value={username}
+                      multiline={true}
+                      onChangeText={(text) => setUsername(text)}
+                      editable={true}
+                    />
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "column",
+                    marginBottom: 6,
+                  }}
+                >
+                  <View
+                    style={{
+                      height: 44,
+                      width: 275,
+                      borderColor: "grey",
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      marginVertical: 6,
+                      justifyContent: "center",
+                      paddingLeft: 8,
+                      alignSelf: "center",
+                    }}
+                  >
+                    <TextInput
+                      style={{ fontSize: 14 }}
+                      placeholder="First Name"
+                      value={firstName}
+                      multiline={true}
+                      onChangeText={(value) => setFirstName(value)}
+                      editable={true}
+                    />
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "column",
+                    marginBottom: 6,
+                  }}
+                >
+                  <View
+                    style={{
+                      height: 44,
+                      width: 275,
+                      borderColor: "grey",
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      marginVertical: 6,
+                      justifyContent: "center",
+                      paddingLeft: 8,
+                      alignSelf: "center",
+                    }}
+                  >
+                    <TextInput
+                      style={{ fontSize: 14 }}
+                      placeholder="Last Name"
+                      value={lastName}
+                      multiline={true}
+                      onChangeText={(value) => setLastName(value)}
+                      editable={true}
+                    />
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "column",
+                    marginBottom: 6,
+                  }}
+                >
+                  <View
+                    style={{
+                      height: 44,
+                      width: 275,
+                      borderColor: "grey",
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      marginVertical: 6,
+                      justifyContent: "center",
+                      paddingLeft: 8,
+                      alignSelf: "center",
+                    }}
+                  >
+                    {Platform.OS === "ios" ? (
+                      <Pressable onPress={toggleDatePicker}>
+                        <Text style={{ fontSize: 14 }}>
+                          {dateOfBirth
+                            ? dateOfBirth.toLocaleDateString()
+                            : "Date of Birth"}
+                        </Text>
+                      </Pressable>
+                    ) : (
+                      <Pressable onPress={toggleDatePicker}>
+                        <TextInput
+                          style={{ fontSize: 14 }}
+                          placeholder={
+                            temporaryDate
+                              ? temporaryDate.toLocaleDateString()
+                              : "Date of Birth"
+                          }
+                          value={
+                            temporaryDate
+                              ? temporaryDate.toLocaleDateString()
+                              : ""
+                          }
+                          multiline={true}
+                          onChangeText={(value) => setTemporaryDate(value)}
+                          editable={false}
+                        />
+                      </Pressable>
+                    )}
+                  </View>
+                </View>
+
+                <View style={{ flexDirection: "column", marginBottom: 6 }}>
+                  <Pressable onPress={() => setShowModalForEthnicities(true)}>
+                    <View
+                      style={{
+                        height: 44,
+                        width: 275,
+                        borderColor: "grey",
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        marginVertical: 6,
+                        justifyContent: "center",
+                        paddingLeft: 8,
+                        alignSelf: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: selectedEthnicity
+                            ? "black"
+                            : "rgba(0, 0, 0, 0.5)",
+                        }}
+                      >
+                        {selectedEthnicity
+                          ? selectedEthnicity.name
+                          : "Select Ethnicity"}
+                      </Text>
+                    </View>
+                  </Pressable>
+
+                  <Modal transparent={true} visible={showModalForEthnicities}>
+                    <TouchableWithoutFeedback
+                      onPress={() => setShowModalForEthnicities(false)}
+                    >
+                      <View style={styles.centerView}>
+                        <View style={styles.ethnicityModal}>
+                          <Text style={styles.modalHeader}>
+                            Select Ethnicity
+                          </Text>
+                          <FlatList
+                            data={ethnicities}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                              <Pressable
+                                style={styles.ethnicityItem}
+                                onPress={() => {
+                                  handleSelectEthnicity(item);
+                                  setShowModalForEthnicities(false); // Close the modal after selecting an ethnicity
+                                }}
+                              >
+                                <Text style={styles.ethnicityText}>
+                                  {item.name}
+                                </Text>
+                              </Pressable>
+                            )}
+                          />
+                        </View>
+                      </View>
+                    </TouchableWithoutFeedback>
+                  </Modal>
+                </View>
+
+                <View style={styles.updateAndCancel}>
+                  <Pressable style={styles.updateButton} onPress={handleUpdate}>
+                    <Text
+                      style={{
+                        fontFamily: "OpenSans-SemiBold",
+                        color: "white",
+                        fontSize: 20,
+                      }}
+                    >
+                      Update
+                    </Text>
+                  </Pressable>
+                  <Pressable style={styles.cancelButton} onPress={handleCancel}>
+                    <Text
+                      style={{
+                        fontFamily: "OpenSans-SemiBold",
+                        color: "white",
+                        fontSize: 20,
+                      }}
+                    >
+                      Cancel
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
+        {showPicker && Platform.OS === "ios" && (
+          <DateTimePicker
+            mode="date"
+            display="spinner"
+            value={dateOfBirth || new Date()}
+            onChange={onChangeDate}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 1,
+              backgroundColor: "white",
+            }}
+            textColor="black"
+          />
+        )}
       </Modal>
       <Pressable onPress={() => setShowModalOne(true)}>
         <View style={styles.textOptions}>
@@ -335,122 +520,26 @@ const EditInfo = () => {
           </Text>
         </View>
       </Pressable>
-      <Modal transparent={true} visible={showModalTwo}>
-        <View style={styles.centerView}>
-          <View style={styles.modalViewTwo}>
-            <View style={styles.modalOverhead}>
-              <Text
-                style={{
-                  fontFamily: "OpenSans-Bold",
-                  fontSize: 25,
-                  color: "white",
-                  textAlign: "center",
-                  position: "relative",
-                }}
-              >
-                Change Password
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "column",
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  height: 44,
-                  width: 275,
-                  borderColor: "grey",
-                  borderWidth: 1,
-                  borderRadius: 4,
-                  marginVertical: 6,
-                  justifyContent: "center",
-                  paddingLeft: 8,
-                  alignSelf: "center",
-                }}
-              >
-                <TextInput
-                  placeholder="Old Password"
-                  value={oldPass}
-                  multiline={true}
-                  onChangeText={(value) => setOldPass(value)}
-                  editable={true}
-                />
-              </View>
-            </View>
 
-            <View
-              style={{
-                flexDirection: "column",
-                marginBottom: 6,
-              }}
-            >
-              <View
-                style={{
-                  height: 44,
-                  width: 275,
-                  borderColor: "grey",
-                  borderWidth: 1,
-                  borderRadius: 4,
-                  marginVertical: 6,
-                  justifyContent: "center",
-                  paddingLeft: 8,
-                  alignSelf: "center",
-                }}
-              >
-                <TextInput
-                  placeholder="New Password"
-                  value={newPass}
-                  multiline={true}
-                  onChangeText={(value) => setNewPass(value)}
-                  editable={true}
-                />
-              </View>
-            </View>
-            <Pressable
-              style={styles.updateButton}
-              onPress={() => setShowModalTwo(false)}
-            >
-              <Text
-                style={{
-                  fontFamily: "OpenSans-SemiBold",
-                  color: "white",
-                  fontSize: 20,
-                }}
-              >
-                Update
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-      <Pressable onPress={() => setShowModalTwo(true)}>
+      <Pressable onPress={handleSignOut}>
         <View style={styles.textOptions}>
           <Icon
-            name="locked-padlock-outline"
+            name="exit-to-app-button"
             height={25}
             width={25}
             color="black"
           />
-          <Text style={{ fontFamily: "OpenSans-SemiBold", fontSize: 18 }}>
-            Change Password
+          <Text
+            style={{
+              fontFamily: "OpenSans-SemiBold",
+              fontSize: 18,
+              color: "black",
+            }}
+          >
+            Sign Out
           </Text>
         </View>
       </Pressable>
-
-      <View style={styles.textOptions}>
-        <Icon name="exit-to-app-button" height={25} width={25} color="black" />
-        <Text
-          style={{
-            fontFamily: "OpenSans-SemiBold",
-            fontSize: 18,
-            color: "black",
-          }}
-        >
-          Sign Out
-        </Text>
-      </View>
       <Pressable onPress={handleDeleteAccount}>
         <View style={styles.textOptions}>
           <Icon

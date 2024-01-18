@@ -1,4 +1,4 @@
-import { Tabs, Navigator, Stack, ExpoRoot } from "expo-router";
+import { Tabs } from "expo-router";
 import Icon from "react-native-ico-material-design";
 
 import colors from "../config/colors";
@@ -16,7 +16,7 @@ export default () => {
           fontSize: 15,
         },
         tabBarStyle: {
-          backgroundColor: colors.secondary,
+          backgroundColor: "#1abc9c",
           height: 60,
           borderWidth: 0,
           borderColor: colors.primary,
@@ -80,7 +80,7 @@ export default () => {
           tabBarLabel: "Settings",
           headerShown: true,
           headerStyle: {
-            backgroundColor: colors.secondary,
+            backgroundColor: "#1abc9c",
           },
           headerTitle: "Settings",
           headerTitleStyle: {

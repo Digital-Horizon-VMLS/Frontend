@@ -5,7 +5,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const fetchAndStoreTokens = async (userID) => {
   try {
-    const response = await axios.post("/api/tokens", { user_id: userID });
+    const response = await axios.post("/api/tokens", {
+      token: userID,
+      type: "id",
+    });
     const {
       access_token,
       access_expires_in,
